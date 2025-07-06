@@ -56,20 +56,4 @@ export class GoldPriceService {
       throw new Error("Failed to fetch gold price");
     }
   }
-
-  // Method to calculate price for a specific weight
-  async calculatePrice(weight: number): Promise<number> {
-    const goldPrice = await this.getGoldPrice();
-    return weight * goldPrice;
-  }
-
-  // Method to get current cached price without API call
-  getCachedPrice(): number | null {
-    return this.goldPriceCache?.price || null;
-  }
-
-  // Method to invalidate cache (useful for testing or manual refresh)
-  invalidateCache(): void {
-    this.goldPriceCache = null;
-  }
 }

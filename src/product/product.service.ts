@@ -19,22 +19,23 @@ export class ProductService {
   }): Promise<any> {
     try {
       const query: any = {};
-
+      // filter by min score required
       if (filters.minScore !== undefined) {
         query.popularityScore = { $gte: filters.minScore };
       }
 
       const products = await this.productModel.find(query).exec();
 
-      // Get gold price once for all products
+      // Get gold price
       const goldPrice = await this.goldPriceService.getGoldPrice();
 
       const minPrice = filters.minPrice || 0;
       const maxPrice = filters.maxPrice || Number.MAX_SAFE_INTEGER;
 
-      // Calculate prices for all products using the same gold price
+      // Calculate prices for all products
       const productsWithPrices = products.map((product) => {
-        const price = product.weight * goldPrice;
+        const price =
+          (product.popularityScore + 1) * product.weight * goldPrice;
         return {
           ...product.toObject(),
           price: price,
