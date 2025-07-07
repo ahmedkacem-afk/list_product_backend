@@ -55,12 +55,27 @@ export class ProductService {
   }
 
   async seedProductsFromFile() {
-    const filePath = path.join(__dirname, "..", "data", "products.json");
-    const rawData = fs.readFileSync(filePath, "utf8");
-    const products = JSON.parse(rawData);
-
     try {
+      // Check if products already exist in the database
+      const existingProductsCount = await this.productModel.countDocuments();
+
+      if (existingProductsCount > 0) {
+        console.log(
+          `Database already contains ${existingProductsCount} products. Skipping seeding.`
+        );
+        return;
+      }
+
+      console.log("Database is empty. Seeding products from JSON file...");
+
+      const filePath = path.join(__dirname, "..", "data", "products.json");
+      const rawData = fs.readFileSync(filePath, "utf8");
+      const products = JSON.parse(rawData);
+
       await this.productModel.insertMany(products, { ordered: false });
+      console.log(
+        `Successfully seeded ${products.length} products to the database.`
+      );
     } catch (error) {
       console.error("Error seeding products from JSON file", error);
     }
